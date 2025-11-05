@@ -4,6 +4,10 @@
 
 A Model Context Protocol server that provides integration with the Coolify API. This server enables interaction with Coolify instances through MCP tools.
 
+<a href="https://glama.ai/mcp/servers/@wrediam/coolify-mcp-server">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@wrediam/coolify-mcp-server/badge" alt="Coolify Server MCP server" />
+</a>
+
 > **Compatibility:** Supports Coolify version 4.0.0-beta.380+ with automatic version detection and feature compatibility. Tested with versions up to 4.0.0-beta.420.1. API endpoints updated to match official Coolify documentation.
 
 ## Prerequisites
