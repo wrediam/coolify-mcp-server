@@ -22,7 +22,7 @@ class CoolifyServer {
     this.server = new Server(
       {
         name: 'coolify-mcp-server',
-        version: '4.1.1',
+        version: '4.3.1',
       },
       {
         capabilities: {
@@ -67,7 +67,7 @@ class CoolifyServer {
         // ── General ──────────────────────────────────────────────────────────
         {
           name: 'get_version',
-          description: 'Get the Coolify version string (e.g. "v4.1.1").',
+          description: 'Get the Coolify version string (e.g. "4.3.1").',
           inputSchema: { type: 'object', properties: {}, required: [] }
         },
         {
@@ -77,12 +77,12 @@ class CoolifyServer {
         },
         {
           name: 'enable_api',
-          description: 'Enable the Coolify API. Requires root-level token.',
+          description: 'Enable the Coolify API. Requires root-level token and Coolify >= 4.2.0.',
           inputSchema: { type: 'object', properties: {}, required: [] }
         },
         {
           name: 'disable_api',
-          description: 'Disable the Coolify API. Requires root-level token.',
+          description: 'Disable the Coolify API. Requires root-level token and Coolify >= 4.2.0.',
           inputSchema: { type: 'object', properties: {}, required: [] }
         },
         {
@@ -203,10 +203,13 @@ class CoolifyServer {
         },
         {
           name: 'validate_server',
-          description: 'Validate server connectivity and configuration.',
+          description: 'Validate server connectivity and configuration. Requires Coolify >= 4.2.0.',
           inputSchema: {
             type: 'object',
-            properties: { uuid: { type: 'string', description: 'Server UUID.' } },
+            properties: {
+              uuid: { type: 'string', description: 'Server UUID.' },
+              install: { type: 'boolean', description: 'Also install Coolify prerequisites on the server.', default: false }
+            },
             required: ['uuid']
           }
         },
@@ -472,23 +475,6 @@ class CoolifyServer {
               instant_deploy: { type: 'boolean', default: false }
             },
             required: ['project_uuid', 'server_uuid', 'docker_registry_image_name', 'ports_exposes']
-          }
-        },
-        {
-          name: 'create_dockercompose_application',
-          description: 'Create an application from a Docker Compose file (no Git).',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              project_uuid: { type: 'string' },
-              server_uuid: { type: 'string' },
-              environment_name: { type: 'string' },
-              environment_uuid: { type: 'string' },
-              docker_compose_raw: { type: 'string', description: 'Raw Docker Compose YAML content.' },
-              name: { type: 'string' },
-              instant_deploy: { type: 'boolean', default: false }
-            },
-            required: ['project_uuid', 'server_uuid']
           }
         },
         {
@@ -1311,11 +1297,12 @@ class CoolifyServer {
           inputSchema: {
             type: 'object',
             properties: {
+              uuid: { type: 'string', description: 'Private key UUID.' },
               name: { type: 'string' },
               description: { type: 'string' },
               private_key: { type: 'string' }
             },
-            required: ['private_key']
+            required: ['uuid', 'private_key']
           }
         },
         {
@@ -1473,11 +1460,11 @@ class CoolifyServer {
             return { content: [{ type: 'text', text: JSON.stringify(r.data, null, 2) }] };
           }
           case 'enable_api': {
-            const r = await this.axiosInstance.get('/enable');
+            const r = await this.axiosInstance.post('/enable');
             return { content: [{ type: 'text', text: JSON.stringify(r.data, null, 2) }] };
           }
           case 'disable_api': {
-            const r = await this.axiosInstance.get('/disable');
+            const r = await this.axiosInstance.post('/disable');
             return { content: [{ type: 'text', text: JSON.stringify(r.data, null, 2) }] };
           }
           case 'enable_mcp': {
@@ -1540,7 +1527,8 @@ class CoolifyServer {
           }
           case 'validate_server': {
             if (!args.uuid) throw new McpError(ErrorCode.InvalidParams, 'uuid is required');
-            const r = await this.axiosInstance.get(`/servers/${args.uuid}/validate`);
+            const { uuid: vsuuid, ...validateBody } = args as Record<string, unknown>;
+            const r = await this.axiosInstance.post(`/servers/${vsuuid}/validate`, validateBody);
             return { content: [{ type: 'text', text: JSON.stringify(r.data, null, 2) }] };
           }
           case 'get_server_resources': {
@@ -1639,10 +1627,6 @@ class CoolifyServer {
             const r = await this.axiosInstance.post('/applications/dockerimage', args);
             return { content: [{ type: 'text', text: JSON.stringify(r.data, null, 2) }] };
           }
-          case 'create_dockercompose_application': {
-            const r = await this.axiosInstance.post('/applications/dockercompose', args);
-            return { content: [{ type: 'text', text: JSON.stringify(r.data, null, 2) }] };
-          }
           case 'update_application': {
             if (!args.uuid) throw new McpError(ErrorCode.InvalidParams, 'uuid is required');
             const { uuid: auuid, ...appPatch } = args as Record<string, unknown>;
@@ -1657,19 +1641,19 @@ class CoolifyServer {
           }
           case 'start_application': {
             if (!args.uuid) throw new McpError(ErrorCode.InvalidParams, 'uuid is required');
-            const { uuid: sauuid, ...startParams } = args as Record<string, unknown>;
-            const r = await this.axiosInstance.get(`/applications/${sauuid}/start`, { params: startParams });
+            const { uuid: sauuid, ...startBody } = args as Record<string, unknown>;
+            const r = await this.axiosInstance.post(`/applications/${sauuid}/start`, startBody);
             return { content: [{ type: 'text', text: JSON.stringify(r.data, null, 2) }] };
           }
           case 'stop_application': {
             if (!args.uuid) throw new McpError(ErrorCode.InvalidParams, 'uuid is required');
-            const { uuid: stauuid, ...stopParams } = args as Record<string, unknown>;
-            const r = await this.axiosInstance.get(`/applications/${stauuid}/stop`, { params: stopParams });
+            const { uuid: stauuid, ...stopBody } = args as Record<string, unknown>;
+            const r = await this.axiosInstance.post(`/applications/${stauuid}/stop`, stopBody);
             return { content: [{ type: 'text', text: JSON.stringify(r.data, null, 2) }] };
           }
           case 'restart_application': {
             if (!args.uuid) throw new McpError(ErrorCode.InvalidParams, 'uuid is required');
-            const r = await this.axiosInstance.get(`/applications/${args.uuid}/restart`);
+            const r = await this.axiosInstance.post(`/applications/${args.uuid}/restart`);
             return { content: [{ type: 'text', text: JSON.stringify(r.data, null, 2) }] };
           }
           case 'get_application_logs': {
@@ -1800,18 +1784,18 @@ class CoolifyServer {
           }
           case 'start_database': {
             if (!args.uuid) throw new McpError(ErrorCode.InvalidParams, 'uuid is required');
-            const r = await this.axiosInstance.get(`/databases/${args.uuid}/start`);
+            const r = await this.axiosInstance.post(`/databases/${args.uuid}/start`);
             return { content: [{ type: 'text', text: JSON.stringify(r.data, null, 2) }] };
           }
           case 'stop_database': {
             if (!args.uuid) throw new McpError(ErrorCode.InvalidParams, 'uuid is required');
-            const { uuid: stopdbuuid, ...stopDbParams } = args as Record<string, unknown>;
-            const r = await this.axiosInstance.get(`/databases/${stopdbuuid}/stop`, { params: stopDbParams });
+            const { uuid: stopdbuuid, ...stopDbBody } = args as Record<string, unknown>;
+            const r = await this.axiosInstance.post(`/databases/${stopdbuuid}/stop`, stopDbBody);
             return { content: [{ type: 'text', text: JSON.stringify(r.data, null, 2) }] };
           }
           case 'restart_database': {
             if (!args.uuid) throw new McpError(ErrorCode.InvalidParams, 'uuid is required');
-            const r = await this.axiosInstance.get(`/databases/${args.uuid}/restart`);
+            const r = await this.axiosInstance.post(`/databases/${args.uuid}/restart`);
             return { content: [{ type: 'text', text: JSON.stringify(r.data, null, 2) }] };
           }
           // Database Backups
@@ -1879,19 +1863,19 @@ class CoolifyServer {
           }
           case 'start_service': {
             if (!args.uuid) throw new McpError(ErrorCode.InvalidParams, 'uuid is required');
-            const r = await this.axiosInstance.get(`/services/${args.uuid}/start`);
+            const r = await this.axiosInstance.post(`/services/${args.uuid}/start`);
             return { content: [{ type: 'text', text: JSON.stringify(r.data, null, 2) }] };
           }
           case 'stop_service': {
             if (!args.uuid) throw new McpError(ErrorCode.InvalidParams, 'uuid is required');
-            const { uuid: stsvuuid, ...stopSvParams } = args as Record<string, unknown>;
-            const r = await this.axiosInstance.get(`/services/${stsvuuid}/stop`, { params: stopSvParams });
+            const { uuid: stsvuuid, ...stopSvBody } = args as Record<string, unknown>;
+            const r = await this.axiosInstance.post(`/services/${stsvuuid}/stop`, stopSvBody);
             return { content: [{ type: 'text', text: JSON.stringify(r.data, null, 2) }] };
           }
           case 'restart_service': {
             if (!args.uuid) throw new McpError(ErrorCode.InvalidParams, 'uuid is required');
-            const { uuid: rsvuuid, ...restartSvParams } = args as Record<string, unknown>;
-            const r = await this.axiosInstance.get(`/services/${rsvuuid}/restart`, { params: restartSvParams });
+            const { uuid: rsvuuid, ...restartSvBody } = args as Record<string, unknown>;
+            const r = await this.axiosInstance.post(`/services/${rsvuuid}/restart`, restartSvBody);
             return { content: [{ type: 'text', text: JSON.stringify(r.data, null, 2) }] };
           }
           // Service Envs
@@ -1953,7 +1937,7 @@ class CoolifyServer {
             return { content: [{ type: 'text', text: JSON.stringify(r.data, null, 2) }] };
           }
           case 'deploy_by_tag_or_uuid': {
-            const r = await this.axiosInstance.get('/deploy', { params: args });
+            const r = await this.axiosInstance.post('/deploy', args);
             return { content: [{ type: 'text', text: JSON.stringify(r.data, null, 2) }] };
           }
 
@@ -1972,7 +1956,9 @@ class CoolifyServer {
             return { content: [{ type: 'text', text: JSON.stringify(r.data, null, 2) }] };
           }
           case 'update_private_key': {
-            const r = await this.axiosInstance.patch('/security/keys', args);
+            if (!args.uuid) throw new McpError(ErrorCode.InvalidParams, 'uuid is required');
+            const { uuid: pkuuid, ...keyPatch } = args as Record<string, unknown>;
+            const r = await this.axiosInstance.patch(`/security/keys/${pkuuid}`, keyPatch);
             return { content: [{ type: 'text', text: JSON.stringify(r.data, null, 2) }] };
           }
           case 'delete_private_key': {
@@ -2069,7 +2055,7 @@ class CoolifyServer {
 
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    console.error('Coolify MCP Server v4.1.1 running on stdio');
+    console.error('Coolify MCP Server v4.3.1 running on stdio');
   }
 }
 

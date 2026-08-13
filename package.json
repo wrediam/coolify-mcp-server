@@ -1,7 +1,7 @@
 {
   "name": "coolify-mcp-server",
-  "version": "4.1.1",
-  "description": "MCP server for Coolify v4.1.1 API — full coverage of all endpoints",
+  "version": "4.3.1",
+  "description": "MCP server for Coolify v4.3.1 API — full coverage of all endpoints",
   "type": "module",
   "main": "build/index.js",
   "bin": {

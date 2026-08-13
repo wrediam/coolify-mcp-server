@@ -1,6 +1,7 @@
 # Coolify API Reference
 
 > **Source:** [`openapi.yaml` on `v4.x` branch](https://raw.githubusercontent.com/coollabsio/coolify/v4.x/openapi.yaml)  
+> **Verified against:** [`routes/api.php` at `v4.3.1`](https://github.com/coollabsio/coolify/blob/v4.3.1/routes/api.php)  
 > **OpenAPI Version:** 3.1.0  
 > **API Version:** 0.1  
 > **Base URL:** `https://<your-coolify-instance>/api/v1`
@@ -52,8 +53,9 @@ Doc: https://coolify.io/docs/api-reference/authorization
 
 ---
 
-### `GET /enable`
+### `POST /enable`
 **operationId:** `enable-api`  
+**Method:** POST only since Coolify v4.2.0.  
 **Summary:** Enable API (root permissions only).  
 **Auth:** Bearer token required  
 **Response 200:** `{ "message": "API enabled." }`  
@@ -62,8 +64,9 @@ Doc: https://coolify.io/docs/api-reference/authorization
 
 ---
 
-### `GET /disable`
+### `POST /disable`
 **operationId:** `disable-api`  
+**Method:** POST only since Coolify v4.2.0.  
 **Summary:** Disable API (root permissions only).  
 **Auth:** Bearer token required  
 **Response 200:** `{ "message": "API disabled." }`  
@@ -158,15 +161,6 @@ Doc: https://coolify.io/docs/api-reference/authorization
 
 ---
 
-### `POST /applications/dockercompose`
-**operationId:** `create-dockercompose-application`  
-**Summary:** Create application from a Docker Compose file (no git).  
-**Required Body Fields:** `project_uuid`, `server_uuid`, `environment_name` or `environment_uuid`  
-**Response 201:** `{ "uuid": string }`  
-**Doc:** https://coolify.io/docs/api-reference/api/operations/create-dockercompose-application
-
----
-
 ### `GET /applications/{uuid}`
 **operationId:** `get-application-by-uuid`  
 **Summary:** Get application by UUID.  
@@ -206,29 +200,32 @@ Doc: https://coolify.io/docs/api-reference/authorization
 
 ---
 
-### `GET /applications/{uuid}/start`
+### `POST /applications/{uuid}/start`
 **operationId:** `start-application-by-uuid`  
-**Summary:** Start application. `POST` also accepted.  
+**Method:** POST only since Coolify v4.2.0.  
+**Summary:** Start application.  
 **Path Params:** `uuid`  
-**Query Params:** `force` (bool, default false), `instant_deploy` (bool, default false)  
+**Body Params:** `force` (bool, default false), `instant_deploy` (bool, default false)  
 **Response 200:** `{ "message": "Deployment request queued.", "deployment_uuid": string }`  
 **Doc:** https://coolify.io/docs/api-reference/api/operations/start-application-by-uuid
 
 ---
 
-### `GET /applications/{uuid}/stop`
+### `POST /applications/{uuid}/stop`
 **operationId:** `stop-application-by-uuid`  
-**Summary:** Stop application. `POST` also accepted.  
+**Method:** POST only since Coolify v4.2.0.  
+**Summary:** Stop application.  
 **Path Params:** `uuid`  
-**Query Params:** `docker_cleanup` (bool, default true)  
+**Body Params:** `docker_cleanup` (bool, default true)  
 **Response 200:** `{ "message": "Application stopping request queued." }`  
 **Doc:** https://coolify.io/docs/api-reference/api/operations/stop-application-by-uuid
 
 ---
 
-### `GET /applications/{uuid}/restart`
+### `POST /applications/{uuid}/restart`
 **operationId:** `restart-application-by-uuid`  
-**Summary:** Restart application. `POST` also accepted.  
+**Method:** POST only since Coolify v4.2.0.  
+**Summary:** Restart application.  
 **Path Params:** `uuid`  
 **Response 200:** `{ "message": "Restart request queued.", "deployment_uuid": string }`  
 **Doc:** https://coolify.io/docs/api-reference/api/operations/restart-application-by-uuid
@@ -430,26 +427,29 @@ Doc: https://coolify.io/docs/api-reference/authorization
 
 ---
 
-### `GET /databases/{uuid}/start`
+### `POST /databases/{uuid}/start`
 **operationId:** `start-database-by-uuid`  
-**Summary:** Start database. `POST` also accepted.  
+**Method:** POST only since Coolify v4.2.0.  
+**Summary:** Start database.  
 **Response 200:** `{ "message": "Database starting request queued." }`  
 **Doc:** https://coolify.io/docs/api-reference/api/operations/start-database-by-uuid
 
 ---
 
-### `GET /databases/{uuid}/stop`
+### `POST /databases/{uuid}/stop`
 **operationId:** `stop-database-by-uuid`  
-**Summary:** Stop database. `POST` also accepted.  
-**Query Params:** `docker_cleanup` (bool, default true)  
+**Method:** POST only since Coolify v4.2.0.  
+**Summary:** Stop database.  
+**Body Params:** `docker_cleanup` (bool, default true)  
 **Response 200:** `{ "message": "Database stopping request queued." }`  
 **Doc:** https://coolify.io/docs/api-reference/api/operations/stop-database-by-uuid
 
 ---
 
-### `GET /databases/{uuid}/restart`
+### `POST /databases/{uuid}/restart`
 **operationId:** `restart-database-by-uuid`  
-**Summary:** Restart database. `POST` also accepted.  
+**Method:** POST only since Coolify v4.2.0.  
+**Summary:** Restart database.  
 **Response 200:** `{ "message": "Database restarting request queued." }`  
 **Doc:** https://coolify.io/docs/api-reference/api/operations/restart-database-by-uuid
 
@@ -615,27 +615,30 @@ Doc: https://coolify.io/docs/api-reference/authorization
 
 ---
 
-### `GET /services/{uuid}/start`
+### `POST /services/{uuid}/start`
 **operationId:** `start-service-by-uuid`  
-**Summary:** Start service. `POST` also accepted.  
+**Method:** POST only since Coolify v4.2.0.  
+**Summary:** Start service.  
 **Response 200:** `{ "message": "Service starting request queued." }`  
 **Doc:** https://coolify.io/docs/api-reference/api/operations/start-service-by-uuid
 
 ---
 
-### `GET /services/{uuid}/stop`
+### `POST /services/{uuid}/stop`
 **operationId:** `stop-service-by-uuid`  
-**Summary:** Stop service. `POST` also accepted.  
-**Query Params:** `docker_cleanup` (bool, default true)  
+**Method:** POST only since Coolify v4.2.0.  
+**Summary:** Stop service.  
+**Body Params:** `docker_cleanup` (bool, default true)  
 **Response 200:** `{ "message": "Service stopping request queued." }`  
 **Doc:** https://coolify.io/docs/api-reference/api/operations/stop-service-by-uuid
 
 ---
 
-### `GET /services/{uuid}/restart`
+### `POST /services/{uuid}/restart`
 **operationId:** `restart-service-by-uuid`  
-**Summary:** Restart service. `POST` also accepted.  
-**Query Params:** `latest` (bool, default false — pull latest images)  
+**Method:** POST only since Coolify v4.2.0.  
+**Summary:** Restart service.  
+**Body Params:** `latest` (bool, default false — pull latest images)  
 **Response 200:** `{ "message": "Service restarting request queued." }`  
 **Doc:** https://coolify.io/docs/api-reference/api/operations/restart-service-by-uuid
 
@@ -749,9 +752,12 @@ Doc: https://coolify.io/docs/api-reference/authorization
 
 ---
 
-### `GET /servers/{uuid}/validate`
+### `POST /servers/{uuid}/validate`
 **operationId:** `validate-server-by-uuid`  
+**Method:** POST only since Coolify v4.2.0.  
 **Summary:** Validate server by UUID.  
+**Path Params:** `uuid`  
+**Body Params:** `install` (bool, default false — also install Coolify prerequisites)  
 **Response 201:** `{ "message": "Validation started." }`  
 **Doc:** https://coolify.io/docs/api-reference/api/operations/validate-server-by-uuid
 
@@ -941,10 +947,11 @@ Doc: https://coolify.io/docs/api-reference/authorization
 
 ---
 
-### `GET /deploy`
+### `POST /deploy`
 **operationId:** `deploy-by-tag-or-uuid`  
-**Summary:** Deploy by tag or UUID. `POST` also accepted with `uuid` and `tag` JSON body.  
-**Query Params:** `tag` (string, comma-separated), `uuid` (string, comma-separated), `force` (bool), `pr` (int — PR id), `pull_request_id` (int), `docker_tag` (string)  
+**Method:** POST only since Coolify v4.2.0.  
+**Summary:** Deploy by tag or UUID.  
+**Body Params:** `tag` (string, comma-separated), `uuid` (string, comma-separated), `force` (bool), `pr` (int — PR id), `pull_request_id` (int), `docker_tag` (string)  
 **Response 200:** `{ "deployments": [{ message, resource_uuid, deployment_uuid }] }`  
 **Doc:** https://coolify.io/docs/api-reference/api/operations/deploy-by-tag-or-uuid
 
@@ -970,9 +977,10 @@ Doc: https://coolify.io/docs/api-reference/authorization
 
 ---
 
-### `PATCH /security/keys`
+### `PATCH /security/keys/{uuid}`
 **operationId:** `update-private-key`  
 **Summary:** Update a private key.  
+**Path Params:** `uuid`  
 **Required Body:** `private_key`  
 **Optional Body:** `name`, `description`  
 **Response 201:** `{ "uuid": string }`  
