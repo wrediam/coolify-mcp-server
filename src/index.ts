@@ -2055,7 +2055,7 @@ class CoolifyServer {
 
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    console.error('Coolify MCP Server v4.1.1 running on stdio');
+    console.error('Coolify MCP Server v4.3.1 running on stdio');
   }
 }
 
