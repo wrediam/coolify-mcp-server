@@ -2,18 +2,25 @@
 
 <img src="graphics/CoolifyMCP.png" width="256" alt="Coolify MCP Logo" />
 
-A Model Context Protocol (MCP) server providing full coverage of the **Coolify v4.1.1** REST API. Manage applications, databases, services, servers, deployments, and more — all from any MCP-compatible AI client.
+A Model Context Protocol (MCP) server providing full coverage of the **Coolify v4.3.1** REST API. Manage applications, databases, services, servers, deployments, and more — all from any MCP-compatible AI client.
 
 <a href="https://glama.ai/mcp/servers/@wrediam/coolify-mcp-server">
   <img width="380" height="200" src="https://glama.ai/mcp/servers/@wrediam/coolify-mcp-server/badge" alt="Coolify Server MCP server" />
 </a>
 
-> **Compatibility:** Coolify v4.1.1+ (stable, non-beta). API base: `https://<your-coolify-instance>/api/v1`
+> **Compatibility:** Coolify v4.x. API base: `https://<your-coolify-instance>/api/v1`
+
+Coolify v4.2.0 made state-changing endpoints POST-only; the former GET routes now
+return `This endpoint has changed to a POST request.` This server issues POST for
+all of them. Lifecycle and deploy operations remain compatible with earlier v4.x
+releases, which accepted both methods. Three tools — `enable_api`, `disable_api`
+and `validate_server` — call endpoints that were GET-only before v4.2.0 and so
+require **Coolify v4.2.0 or newer**.
 
 ## Prerequisites
 
 - Node.js 18 or higher
-- A running Coolify v4.1.1+ instance
+- A running Coolify v4 instance (v4.2.0+ for the three tools noted above)
 - A Coolify API token (from **Security → API Tokens** in the dashboard)
 
 ## Installation
@@ -94,13 +101,16 @@ Set two environment variables:
 ### Applications
 - `list_applications`, `get_application`
 - `create_public_application`, `create_private_github_app_application`, `create_private_deploy_key_application`
-- `create_dockerfile_application`, `create_dockerimage_application`, `create_dockercompose_application`
+- `create_dockerfile_application`, `create_dockerimage_application`
 - `update_application`, `delete_application`
 - `start_application`, `stop_application`, `restart_application`
 - `get_application_logs`
 - `list_application_envs`, `create_application_env`, `update_application_env`, `bulk_update_application_envs`, `delete_application_env`
 - `list_application_storages`, `create_application_storage`, `delete_application_storage`
 - `list_application_scheduled_tasks`, `create_application_scheduled_task`, `delete_application_scheduled_task`
+
+> To create a resource from a raw Docker Compose file, use `create_service` with
+> `docker_compose_raw`. Coolify has no application-level compose creation endpoint.
 
 ### Databases
 - `list_databases`, `get_database`, `update_database`, `delete_database`
